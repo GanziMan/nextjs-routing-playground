@@ -2,8 +2,8 @@ import BookItem from "@/components/book-item";
 import style from "./page.module.css";
 import { BookData } from "@/types";
 import { Suspense } from "react";
-import BookItemSkeleton from "@/components/skeleton/book-item-skeleton";
 import BookListSkeleton from "@/components/skeleton/book-list-skeleton";
+import { Metadata } from "next";
 
 async function Allbooks() {
   const response = await fetch(
@@ -46,6 +46,13 @@ async function RecoBooks() {
 }
 // export const metadata = {
 
+export const metadata: Metadata = {
+  title: "ONEBITE BOOKS",
+  description: "책을 추천해주는 웹사이트입니다.",
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
 export default function Home() {
   return (
     <div className={style.container}>
