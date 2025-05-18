@@ -151,6 +151,94 @@ reset();
 });
 }}
 
+9. 서버 액션 (Server Actions)
+   함수 하나만으로 서버 액션 가능 → 간단 작업에 최적
+
+클라이언트에 JS 코드 전달하지 않아 보안 우수
+
+서버 전용 코드이므로 클라이언트에서 직접 호출 불가 → 폼 제출 등으로 호출됨
+
+예외 처리는 서버·클라이언트 양쪽에서 해야 함
+
+캐시 무효화: revalidatePath
+경로를 지정해 서버에 재생성 요청 → 캐시 무효화
+
+force-cache 하더라도 해당 경로와 관련된 전체 캐시가 무효화됨
+
+새로 생성된 페이지는 다시 풀 라우트 캐시에 저장됨
+
+사용 예시
+호출 구문 설명
+revalidatePath('/book', 'page') /book 페이지 캐시 재검증
+revalidatePath('/book/[id]', 'page') /book 동적 경로 전체 재검증
+revalidatePath('/with-searchbar', 'layout') 특정 레이아웃 재검증
+revalidatePath('/', 'layout') 전체 데이터 재검증
+revalidateTag('tag') 태그 기반 데이터 재검증
+
+10. useActionState
+    Server Action 상태를 쉽게 관리하는 React 훅
+
+폼 제출 상태(pending, error, success) 관리 가능
+
+중복 제출 방지, 로딩 UI, 에러 처리에 활용
+
+11. Parallel Routes (병렬 라우트)
+    하나의 화면에 여러 페이지를 병렬로 렌더링하는 패턴
+
+예: 소셜 미디어 피드 + 사이드바 동시 렌더링
+
+슬롯(@) 폴더를 사용해 레이아웃에 자동 전달
+
+graphql
+복사
+app/
+├─ @sidebar/
+│ └─ page.tsx
+├─ @children/
+│ └─ page.tsx
+└─ layout.tsx
+슬롯명과 같은 이름의 props 형태로 부모 레이아웃에 전달됨
+
+12. Intercepting Routes (인터셉팅 라우트)
+    특정 경로 요청을 가로채 다른 페이지 렌더링 가능
+
+조건: 클라이언트 사이드 내비게이션 시만 동작
+
+폴더명에 (.) 사용해 원래 경로를 인터셉트함
+
+하위 경로 인터셉트 시 ( .. ) 로 단계별 상위 경로 접근 가능
+
+13. 이미지 최적화
+    웹페이지 평균 용량의 58%가 이미지 (http archive 연구)
+
+최적화 필수: WebP, AVIF 변환, 기기 맞춤 이미지 제공, 레이지 로딩, 블러 처리 등
+
+Next.js 자체 이미지 최적화 기능 제공
+
+외부 도메인 이미지 사용 시 next.config.js에 도메인 허용 필요 (보안상 기본 차단)
+
+14. 검색엔진 최적화 (SEO)
+    generateMetadata 함수로 동적 메타데이터 생성 가능 (Promise<Metadata> 반환)
+
+tsx
+복사
+export async function generateMetadata({ id }: { id: string }): Promise<Metadata> {
+const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/book/${id}`);
+if (!response.ok) throw new Error(response.statusText);
+const book = await response.json();
+return {
+title: book.title,
+description: book.description,
+icons: { icon: "/favicon.ico" },
+openGraph: {
+title: book.title,
+description: book.description,
+images: book.coverImgUrl,
+},
+};
+}
+동일 경로 내 여러 곳에서 API 호출 방지를 위해 Request Memoization으로 한번만 요청 수행
+
 ✅ 정리
 
 | 항목         | App Router 특징                                         |
